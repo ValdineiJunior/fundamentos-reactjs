@@ -1,26 +1,40 @@
+import { format, formatDistanceToNow } from "date-fns";
+import ptBR from "date-fns/locale/pt-BR"
+
 import styles from "./Post.module.css"
 import { Comment } from "./Comment"
+import { Avatar } from "./Avatar"
 
-export function Post() {
+export function Post({ author, publishedAt, content }) {
+    const publishedDateFormatted = format(publishedAt, "d 'de' LLLL 'às' HH:mm'h'", {
+        locale: ptBR,
+    })
+
+    const publishedDateRelativeToNow = formatDistanceToNow(publishedAt, {locale: ptBR,
+    addSuffix: true,})
+
     return (
         <article className={styles.post}>
             <header>
                 <div className={styles.author}>
-                    <img className={styles.avatar} src="https://github.com/ValdineiJunior.png"/>
+                    <Avatar src={author.avatarUrl}/>
                     <div className={styles.authorInfo}>
-                        <strong>Valdinei Junior</strong>
-                        <span>Web Developer</span>
+                        <strong>{author.name}</strong>
+                        <span>{author.role}</span>
                     </div>
                 </div>
 
-                <time title="11 de maio as 11e13" dateTime="2022-05-11-- 08:00:38">Publicado a 1h</time>
+                <time title={publishedDateFormatted} dateTime={publishedAt.toISOString()}>{publishedDateRelativeToNow}</time>
             </header>
 
             <div className={styles.content}>
-                <p>Fala galera</p>
-                <p>Acabei de subir mais um projeto no meu portifolio.</p>
-                <p><a href="">jane.design/doctorcare</a></p>
-                <p><a href="">#novoprojeto nlw rocketseat</a></p>
+                {content.map(line => {
+                    if (line.type === "paragraph") {
+                        return <p>{line.content}</p>;
+                    } else {
+                        return <p><a href="#" >{line.content}</a></p>
+                    }
+                })}
             </div>
             
             <form className={styles.commentForm}>
